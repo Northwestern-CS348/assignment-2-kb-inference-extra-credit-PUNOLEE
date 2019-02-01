@@ -142,6 +142,71 @@ class KnowledgeBase(object):
         """
         ####################################################
         # Student code goes here
+        explain = ""
+        indent = 2
+        return self.kb_explain_helper(fact_or_rule, explain, indent)
+
+    def kb_explain_helper(self, fact_or_rule, explain, indent):
+        """
+        Explain where the fact or rule comes from
+
+        Args:
+            fact_or_rule (Fact or Rule) - Fact or rule to be explained
+            explain - string explaining
+            indent - white space counter
+
+        Returns:
+            string explaining hierarchical support from other Facts and rules
+        """
+
+        if isinstance(fact_or_rule, Fact):
+            f = self._get_fact(fact_or_rule)
+            if fact_or_rule not in self.facts:
+                explain = "Fact is not in the KB"
+                return explain
+            else:
+                explain += 'fact: ' + str(f.statement)
+                # fact before rule
+                if f.supported_by !=[]:
+                    for pair in f.supported_by:
+                        explain += '\n'
+                        explain += ''.join(' ' * indent)
+                        explain += 'SUPPORTED BY\n'
+                        for j, fr in enumerate(pair):
+                            explain += ''.join(' ' * (indent + 2))
+                            explain = self.kb_explain_helper(fr, explain, indent + 4)
+                            if fr.asserted:
+                                explain += " ASSERTED"
+                            if j<1:
+                                explain += '\n'
+        else:
+            r = self._get_rule(fact_or_rule)
+            if fact_or_rule not in self.rules:
+                explain = "Rule is not in the KB"
+                return explain
+            else:
+                explain += 'rule: '
+                explain += '('
+                for i, l in enumerate(r.lhs):
+                    explain += str(l)
+                    if i < len(r.lhs)-1:
+                        explain += ', '
+                explain += ')'
+                explain += ' -> '
+                explain += str(r.rhs)
+                if r.supported_by !=[]:
+                    for pair in r.supported_by:
+                        explain += '\n'
+                        explain += ''.join(' ' * indent)
+                        explain += 'SUPPORTED BY\n'
+                        for j, fr in enumerate(pair):
+                            explain += ''.join(' ' * (indent + 2))
+                            explain = self.kb_explain_helper(fr, explain, indent + 4)
+                            if fr.asserted:
+                                explain += " ASSERTED"
+                            if j<1:
+                                explain += '\n'
+        return explain
 
 
 class InferenceEngine(object):
