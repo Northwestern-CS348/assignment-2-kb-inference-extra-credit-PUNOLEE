@@ -158,9 +158,10 @@ class KnowledgeBase(object):
         Returns:
             string explaining hierarchical support from other Facts and rules
         """
-
+        # if it is a fact
         if isinstance(fact_or_rule, Fact):
             f = self._get_fact(fact_or_rule)
+            # if it is not in kb
             if fact_or_rule not in self.facts:
                 explain = "Fact is not in the KB"
                 return explain
@@ -179,12 +180,15 @@ class KnowledgeBase(object):
                                 explain += " ASSERTED"
                             if j<1:
                                 explain += '\n'
+        # if it is a rule
         else:
             r = self._get_rule(fact_or_rule)
+            # if it is not in kb
             if fact_or_rule not in self.rules:
                 explain = "Rule is not in the KB"
                 return explain
             else:
+                # construct a rule explaining
                 explain += 'rule: '
                 explain += '('
                 for i, l in enumerate(r.lhs):
@@ -194,6 +198,7 @@ class KnowledgeBase(object):
                 explain += ')'
                 explain += ' -> '
                 explain += str(r.rhs)
+                # fact before rule
                 if r.supported_by !=[]:
                     for pair in r.supported_by:
                         explain += '\n'
